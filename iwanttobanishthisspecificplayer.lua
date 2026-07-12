@@ -21,6 +21,8 @@ end
 local gui = Instance.new("ScreenGui")
 local frame = Instance.new("Frame")
 local title = Instance.new("TextLabel")
+local minimizeBtn = Instance.new("TextButton")
+local closeBtn = Instance.new("TextButton")
 local plrLabel = Instance.new("TextLabel")
 local plrInput = Instance.new("TextBox")
 local powerLabel = Instance.new("TextLabel")
@@ -41,14 +43,36 @@ frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
-title.Size = UDim2.new(1, 0, 0, 25)
+title.Size = UDim2.new(1, -60, 0, 25)
+title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 title.BorderSizePixel = 0
-title.Text = "iwanttobanishthisspecificplayer @gpssickle"
+title.Text = "iwanttobanishthisspecificplayer"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 14
 title.Parent = frame
+minimizeBtn.Size = UDim2.new(0, 30, 0, 20)
+minimizeBtn.Position = UDim2.new(1, -55, 0, 2)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+minimizeBtn.BorderSizePixel = 0
+minimizeBtn.Text = "—"
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.Font = Enum.Font.SourceSansBold
+minimizeBtn.TextSize = 14
+minimizeBtn.AutoButtonColor = false
+minimizeBtn.Parent = frame
+closeBtn.Size = UDim2.new(0, 30, 0, 20)
+closeBtn.Position = UDim2.new(1, -25, 0, 2)
+closeBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 14
+closeBtn.AutoButtonColor = false
+closeBtn.Parent = frame
+
 plrLabel.Size = UDim2.new(0, 80, 0, 20)
 plrLabel.Position = UDim2.new(0, 10, 0, 35)
 plrLabel.BackgroundTransparency = 1
@@ -124,7 +148,7 @@ toggleBtn.Parent = frame
 infoLabel.Size = UDim2.new(1, -20, 0, 16)
 infoLabel.Position = UDim2.new(0, 10, 0, 155)
 infoLabel.BackgroundTransparency = 1
-infoLabel.Text = "Targets: 0 / Cycling: No"
+infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: No"
 infoLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 infoLabel.Font = Enum.Font.SourceSans
 infoLabel.TextSize = 11
@@ -141,7 +165,49 @@ local currentTargetIndex = 1
 local useAllMode = false
 local respawnConnections = {}
 local isInvisible = false
+local isMinimized = false
+local originalSize = frame.Size
 pc()
+minimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    
+    if isMinimized then
+        originalSize = frame.Size
+        frame.Size = UDim2.new(0, 240, 0, 25)
+        plrLabel.Visible = false
+        plrInput.Visible = false
+        powerLabel.Visible = false
+        powerInput.Visible = false
+        viewLabel.Visible = false
+        viewToggle.Visible = false
+        targetLabel.Visible = false
+        toggleBtn.Visible = false
+        infoLabel.Visible = false
+        minimizeBtn.Text = "+"
+    else
+        frame.Size = originalSize
+        plrLabel.Visible = true
+        plrInput.Visible = true
+        powerLabel.Visible = true
+        powerInput.Visible = true
+        viewLabel.Visible = true
+        viewToggle.Visible = true
+        targetLabel.Visible = true
+        toggleBtn.Visible = true
+        infoLabel.Visible = true
+        minimizeBtn.Text = "—"
+    end
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    if isFlinging then
+        nothrow()
+    end
+    if viewConnection then
+        viewConnection:Disconnect()
+    end
+    gui:Destroy()
+end)
 
 local viewConnection = nil
 local function findit()
@@ -248,7 +314,7 @@ local function re(target)
         end
         if not found then
             table.insert(currentTargets, target)
-            infoLabel.Text = "Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "No")
+            infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "No")
         end
     end)
 end
@@ -305,7 +371,7 @@ local function nothrow()
     currentTargetIndex = 1
     toggleBtn.Text = "START"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-    infoLabel.Text = "Targets: 0 / Cycling: No"
+    infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: No"
 end
 
 local function waitforit()
@@ -368,7 +434,7 @@ local function throwit()
     isFlinging = true
     toggleBtn.Text = "STOP"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
-    infoLabel.Text = "Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "No")
+    infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "No")
     
     setInvisible(true)
     
@@ -531,4 +597,4 @@ LP.CharacterAdded:Connect(function()
         end
         setInvisible(true)
     end
-end)
+end
