@@ -21,8 +21,8 @@ end
 local gui = Instance.new("ScreenGui")
 local frame = Instance.new("Frame")
 local title = Instance.new("TextLabel")
-local minimizeBtn = Instance.new("TextButton")
-local closeBtn = Instance.new("TextButton")
+local minimizeBtn = Instance.new("TextButton")  -- ADDED
+local closeBtn = Instance.new("TextButton")    -- ADDED
 local plrLabel = Instance.new("TextLabel")
 local plrInput = Instance.new("TextBox")
 local powerLabel = Instance.new("TextLabel")
@@ -72,7 +72,6 @@ closeBtn.Font = Enum.Font.SourceSansBold
 closeBtn.TextSize = 14
 closeBtn.AutoButtonColor = false
 closeBtn.Parent = frame
-
 plrLabel.Size = UDim2.new(0, 80, 0, 20)
 plrLabel.Position = UDim2.new(0, 10, 0, 35)
 plrLabel.BackgroundTransparency = 1
@@ -148,7 +147,7 @@ toggleBtn.Parent = frame
 infoLabel.Size = UDim2.new(1, -20, 0, 16)
 infoLabel.Position = UDim2.new(0, 10, 0, 155)
 infoLabel.BackgroundTransparency = 1
-infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: No"
+infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: Hell nah"
 infoLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 infoLabel.Font = Enum.Font.SourceSans
 infoLabel.TextSize = 11
@@ -198,7 +197,6 @@ minimizeBtn.MouseButton1Click:Connect(function()
         minimizeBtn.Text = "—"
     end
 end)
-
 closeBtn.MouseButton1Click:Connect(function()
     if isFlinging then
         nothrow()
@@ -208,7 +206,6 @@ closeBtn.MouseButton1Click:Connect(function()
     end
     gui:Destroy()
 end)
-
 local viewConnection = nil
 local function findit()
     local pattern = plrInput.Text:lower()
@@ -223,7 +220,6 @@ local function findit()
     end
     return nil
 end
-
 local function refreshit()
     if not isViewEnabled then return end
     
@@ -239,7 +235,6 @@ local function refreshit()
         targetLabel.Text = "No target"
     end
 end
-
 local function seekit()
     if viewConnection then
         viewConnection:Disconnect()
@@ -258,7 +253,6 @@ local function seekit()
     
     refreshit()
 end
-
 local function noseek()
     if viewConnection then
         viewConnection:Disconnect()
@@ -270,7 +264,6 @@ local function noseek()
     end
     targetLabel.Text = ""
 end
-
 local function getname(pattern)
     local list = {}
     pattern = pattern:lower()
@@ -293,7 +286,6 @@ local function getname(pattern)
     
     return list
 end
-
 local function re(target)
     if respawnConnections[target] then
         respawnConnections[target]:Disconnect()
@@ -314,18 +306,16 @@ local function re(target)
         end
         if not found then
             table.insert(currentTargets, target)
-            infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "No")
+            infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "Hell nah")
         end
     end)
 end
-
 local function clrre()
     for target, conn in pairs(respawnConnections) do
         conn:Disconnect()
     end
     respawnConnections = {}
 end
-
 local function setInvisible(state)
     local char = LP.Character
     if char then
@@ -344,7 +334,6 @@ local function setInvisible(state)
     end
     isInvisible = state
 end
-
 local function nothrow()
     isFlinging = false
     
@@ -371,9 +360,8 @@ local function nothrow()
     currentTargetIndex = 1
     toggleBtn.Text = "START"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-    infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: No"
+    infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: Hell nah"
 end
-
 local function waitforit()
     while isFlinging do
         local charAdded = LP.CharacterAdded:Wait()
@@ -400,7 +388,6 @@ local function waitforit()
         end
     end
 end
-
 local function throwit()
     if isFlinging then
         nothrow()
@@ -434,7 +421,7 @@ local function throwit()
     isFlinging = true
     toggleBtn.Text = "STOP"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
-    infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "No")
+    infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "Hell nah")
     
     setInvisible(true)
     
@@ -597,4 +584,4 @@ LP.CharacterAdded:Connect(function()
         end
         setInvisible(true)
     end
-end
+end)
