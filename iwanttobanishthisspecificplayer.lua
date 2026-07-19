@@ -21,8 +21,8 @@ end
 local gui = Instance.new("ScreenGui")
 local frame = Instance.new("Frame")
 local title = Instance.new("TextLabel")
-local minimizeBtn = Instance.new("TextButton")  -- ADDED
-local closeBtn = Instance.new("TextButton")    -- ADDED
+local minimizeBtn = Instance.new("TextButton")
+local closeBtn = Instance.new("TextButton")
 local plrLabel = Instance.new("TextLabel")
 local plrInput = Instance.new("TextBox")
 local powerLabel = Instance.new("TextLabel")
