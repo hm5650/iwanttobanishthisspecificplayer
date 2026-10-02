@@ -3,10 +3,13 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LP = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
+local partcon = false
 local pc = function()
+    if partcon then return end
+    partcon = true
     local plr = game.Players.LocalPlayer
     task.spawn(function()
-        while true do
+        while partcon do
             pcall(function()
                 Workspace.FallenPartsDestroyHeight = -999999999999999999999999999999999999999999999999e9999999999999999999999999999999999999999999999999999999999999999999
                 plr.ReplicationFocus = workspace
@@ -16,6 +19,12 @@ local pc = function()
             end)
             task.wait(0.01)
         end
+        pcall(function()
+            plr.ReplicationFocus = nil
+            plr.SimulationRadius = 256
+            plr.MaximumSimulationRadius = 1000
+            settings().Physics.AllowSleep = true
+        end)
     end)
 end
 local gui = Instance.new("ScreenGui")
@@ -154,24 +163,28 @@ infoLabel.TextSize = 11
 infoLabel.TextXAlignment = Enum.TextXAlignment.Left
 infoLabel.Parent = frame
 gui.Parent = (LP.PlayerGui or game:GetService("CoreGui"))
-local isFlinging = false
-local isViewEnabled = false
-local flingPower = 900
-local originalCFrame = nil
-local connection = nil
-local currentTargets = {}
-local currentTargetIndex = 1
-local useAllMode = false
-local respawnConnections = {}
-local isInvisible = false
-local isMinimized = false
-local originalSize = frame.Size
+local f = false
+local vi = false
+local powa = 900
+local org = nil
+local orgg = Workspace.FallenPartsDestroyHeight
+local tar = {}
+local tarindex = 1
+local alllllll = false
+local respawnfullly = {}
+local dihhh = false
+local collapsed = false
+local orggg = frame.Size
+local sigram = nil
+local ft = nil
+local fr = false
+local buhbye = false
+local seatMonitorThread = nil
 pc()
 minimizeBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    
-    if isMinimized then
-        originalSize = frame.Size
+    collapsed = not collapsed
+    if collapsed then
+        orggg = frame.Size
         frame.Size = UDim2.new(0, 240, 0, 25)
         plrLabel.Visible = false
         plrInput.Visible = false
@@ -184,7 +197,7 @@ minimizeBtn.MouseButton1Click:Connect(function()
         infoLabel.Visible = false
         minimizeBtn.Text = "+"
     else
-        frame.Size = originalSize
+        frame.Size = orggg
         plrLabel.Visible = true
         plrInput.Visible = true
         powerLabel.Visible = true
@@ -197,20 +210,9 @@ minimizeBtn.MouseButton1Click:Connect(function()
         minimizeBtn.Text = "—"
     end
 end)
-closeBtn.MouseButton1Click:Connect(function()
-    if isFlinging then
-        nothrow()
-    end
-    if viewConnection then
-        viewConnection:Disconnect()
-    end
-    gui:Destroy()
-end)
-local viewConnection = nil
 local function findit()
     local pattern = plrInput.Text:lower()
     if pattern == "" then return nil end
-    
     for _, p in ipairs(Players:GetPlayers()) do
         if p ~= LP then
             if p.Name:lower():find(pattern) or (p.DisplayName:lower():find(pattern)) then
@@ -221,8 +223,7 @@ local function findit()
     return nil
 end
 local function refreshit()
-    if not isViewEnabled then return end
-    
+    if not vi then return end
     local target = findit()
     if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
         local hrp = target.Character.HumanoidRootPart
@@ -236,29 +237,27 @@ local function refreshit()
     end
 end
 local function seekit()
-    if viewConnection then
-        viewConnection:Disconnect()
+    if sigram then
+        sigram:Disconnect()
+        sigram = nil
     end
-    
-    viewConnection = RunService.RenderStepped:Connect(function()
-        if not isViewEnabled then
-            if viewConnection then
-                viewConnection:Disconnect()
-                viewConnection = nil
+    sigram = RunService.RenderStepped:Connect(function()
+        if not vi then
+            if sigram then
+                sigram:Disconnect()
+                sigram = nil
             end
             return
         end
         refreshit()
     end)
-    
     refreshit()
 end
 local function noseek()
-    if viewConnection then
-        viewConnection:Disconnect()
-        viewConnection = nil
+    if sigram then
+        sigram:Disconnect()
+        sigram = nil
     end
-    
     if LP.Character and LP.Character:FindFirstChild("Humanoid") then
         workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid
     end
@@ -267,7 +266,6 @@ end
 local function getname(pattern)
     local list = {}
     pattern = pattern:lower()
-    
     if pattern == "all" then
         for _, p in ipairs(Players:GetPlayers()) do
             if p ~= LP then
@@ -283,38 +281,34 @@ local function getname(pattern)
             end
         end
     end
-    
     return list
 end
 local function re(target)
-    if respawnConnections[target] then
-        respawnConnections[target]:Disconnect()
+    if respawnfullly[target] then
+        respawnfullly[target]:Disconnect()
     end
-    
-    respawnConnections[target] = target.CharacterAdded:Connect(function(newChar)
-        if not isFlinging then return end
-        
+    respawnfullly[target] = target.CharacterAdded:Connect(function(newChar)
+        if not f then return end
         local hrp = newChar:WaitForChild("HumanoidRootPart", 5)
         if not hrp then return end
-        
         local found = false
-        for _, t in ipairs(currentTargets) do
+        for _, t in ipairs(tar) do
             if t == target then
                 found = true
                 break
             end
         end
         if not found then
-            table.insert(currentTargets, target)
-            infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "Hell nah")
+            table.insert(tar, target)
+            infoLabel.Text = "(@gpssickle) Targets: " .. #tar .. " / Cycling: " .. (alllllll and "Yessirski" or "Hell nah")
         end
     end)
 end
 local function clrre()
-    for target, conn in pairs(respawnConnections) do
-        conn:Disconnect()
+    for _, conn in pairs(respawnfullly) do
+        pcall(function() conn:Disconnect() end)
     end
-    respawnConnections = {}
+    respawnfullly = {}
 end
 local function setInvisible(state)
     local char = LP.Character
@@ -332,236 +326,460 @@ local function setInvisible(state)
             humanoid.NameDisplayDistance = state and 0 or 100
         end
     end
-    isInvisible = state
+    dihhh = state
 end
 local function nothrow()
-    isFlinging = false
-    
-    if connection then
-        connection:Disconnect()
-        connection = nil
-    end
+    f = false
+    fr = false
+    ft = nil
     clrre()
-    
-    setInvisible(false)
-    
+    task.wait(0.15)
     local char = LP.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    if hrp and originalCFrame then
-        hrp.CFrame = originalCFrame
+    if hrp then
+        for _, child in ipairs(hrp:GetChildren()) do
+            if child:IsA("BodyVelocity")
+                or child:IsA("BodyGyro")
+                or child:IsA("BodyAngularVelocity")
+                or child:IsA("BodyForce") then
+                child:Destroy()
+            end
+        end
+    end
+    setInvisible(false)
+    Workspace.FallenPartsDestroyHeight = orgg
+    if hrp and org then
+        hrp.CFrame = org
         hrp.Velocity = Vector3.zero
         hrp.RotVelocity = Vector3.zero
         hrp.AssemblyLinearVelocity = Vector3.zero
         hrp.AssemblyAngularVelocity = Vector3.zero
+        if char then
+            char:SetPrimaryPartCFrame(org)
+        end
         pcall(sethiddenproperty, hrp, "PhysicsRepRootPart", hrp)
     end
-    
-    currentTargets = {}
-    currentTargetIndex = 1
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            workspace.CurrentCamera.CameraSubject = humanoid
+        end
+    end
+    tar = {}
+    tarindex = 1
+    org = nil
     toggleBtn.Text = "START"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
     infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: Hell nah"
 end
 local function waitforit()
-    while isFlinging do
+    while f do
         local charAdded = LP.CharacterAdded:Wait()
         task.wait(0.5)
-        
         local char = charAdded
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         local humanoid = char and char:FindFirstChild("Humanoid")
-        
         if hrp and humanoid then
             repeat
                 task.wait(0.1)
                 humanoid = char:FindFirstChild("Humanoid")
-            until not humanoid or humanoid.Health > 0 or not isFlinging
-            
-            if not isFlinging then break end
-            originalCFrame = hrp.CFrame
+            until not humanoid or humanoid.Health > 0 or not f
+            if not f then break end
+            org = hrp.CFrame
             setInvisible(true)
-            for _, target in ipairs(currentTargets) do
+            for _, target in ipairs(tar) do
                 re(target)
             end
-            
             break
         end
     end
 end
+local function nosittingforyou()
+    local char = LP.Character
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    if not hum.Sit then return end
+    local seat = hum.SeatPart
+    if not seat then return end
+    if not (seat:IsA("Seat") or seat:IsA("VehicleSeat")) then return end
+    pcall(function()
+        hum.Sit = false
+        hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+    end)
+    task.delay(0.25, function()
+        if hum and hum.Parent then
+            pcall(function()
+                hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+            end)
+        end
+    end)
+end
+local function meh()
+    if seatMonitorThread then return end
+    seatMonitorThread = task.spawn(function()
+        while f do
+            pcall(nosittingforyou)
+            task.wait(0.1)
+        end
+        seatMonitorThread = nil
+    end)
+end
+local function mehh()
+    local char = LP.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            pcall(function()
+                hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+            end)
+        end
+    end
+    seatMonitorThread = nil
+end
+local function seaterchecker(TargetPlayer)
+    local TCharacter = TargetPlayer.Character
+    if not TCharacter then return nil, "nochar" end
+    local THumanoid = TCharacter:FindFirstChildOfClass("Humanoid")
+    if not THumanoid then return nil, "nohum" end
+    if not THumanoid.Sit then
+        return THumanoid, "standing"
+    end
+    local seat = THumanoid.SeatPart
+    if not seat then
+        return THumanoid, "standing"
+    end
+    if not (seat:IsA("Seat") or seat:IsA("VehicleSeat")) then
+        return THumanoid, "standing"
+    end
+    if seat.Anchored then
+        return nil, "anchored"
+    end
+    return THumanoid, "unanchored"
+end
+local function stupidfling(TargetPlayer)
+    if fr then return false end
+    local THumanoid, seatState = seaterchecker(TargetPlayer)
+    if not THumanoid then
+        return false
+    end
+    fr = true
+    local Character = LP.Character
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+    local RootPart = Humanoid and Humanoid.RootPart
+    local TCharacter = TargetPlayer.Character
+    local TRootPart = THumanoid.RootPart
+    local THead = TCharacter and TCharacter:FindFirstChild("Head")
+    local Accessory = TCharacter and TCharacter:FindFirstChildOfClass("Accessory")
+    local Handle = Accessory and Accessory:FindFirstChild("Handle")
+    if not Character or not Humanoid or not RootPart then
+        fr = false
+        return false
+    end
+    if not TCharacter or not THumanoid then
+        fr = false
+        return false
+    end
+    local TSeat = nil
+    local TSeatWasAnchored = nil
+    if THumanoid.Sit and THumanoid.SeatPart then
+        local seat = THumanoid.SeatPart
+        if (seat:IsA("Seat") or seat:IsA("VehicleSeat")) and not seat.Anchored then
+            TSeat = seat
+            TSeatWasAnchored = seat.Anchored
+            pcall(function() seat.Anchored = true end)
+        end
+    end
+    local OldPos = RootPart.CFrame
+    local OldFPDH = workspace.FallenPartsDestroyHeight
+    workspace.FallenPartsDestroyHeight = 0 / 0
+    if THead then
+        workspace.CurrentCamera.CameraSubject = THead
+    elseif Handle then
+        workspace.CurrentCamera.CameraSubject = Handle
+    else
+        workspace.CurrentCamera.CameraSubject = THumanoid
+    end
+    local folkenhawking = Instance.new("BodyVelocity")
+    folkenhawking.Name = "4827288273838_83727_38282829"
+    folkenhawking.Parent = RootPart
+    folkenhawking.Velocity = Vector3.new(9e8, 9e8, 9e8)
+    folkenhawking.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
+    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+    local function bppos(BasePart, Pos, Ang)
+        if not f then return end
+        if not RootPart or not RootPart.Parent then return end
+        RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+        Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+        RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+        RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+    end
+    local function bpart(BasePart)
+        local TimeToWait = 1
+        local Time = tick()
+        local Angle = 0
+        repeat
+            if not f then break end
+            if not RootPart or not RootPart.Parent then break end
+            if not THumanoid or not THumanoid.Parent then break end
+            if not BasePart or not BasePart.Parent then break end
+            if BasePart.Velocity.Magnitude < 50 then
+                Angle = Angle + 100
+                bppos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(2.25, 1.5, -2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(-2.25, -1.5, 2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection, CFrame.Angles(math.rad(Angle), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection, CFrame.Angles(math.rad(Angle), 0, 0))
+                task.wait()
+            else
+                bppos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(-90), 0, 0))
+                task.wait()
+                bppos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                task.wait()
+            end
+        until not f
+            or BasePart.Velocity.Magnitude > 500
+            or BasePart.Parent ~= TargetPlayer.Character
+            or TargetPlayer.Parent ~= Players
+            or THumanoid.Sit
+            or Humanoid.Health <= 0
+            or tick() > Time + TimeToWait
+    end
+    if TRootPart and THead then
+        if (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
+            bpart(THead)
+        else
+            bpart(TRootPart)
+        end
+    elseif TRootPart and not THead then
+        bpart(TRootPart)
+    elseif not TRootPart and THead then
+        bpart(THead)
+    elseif not TRootPart and not THead and Accessory and Handle then
+        bpart(Handle)
+    end
+    if TSeat and TSeat.Parent and f then
+        local seatHandle = TSeat:FindFirstChild("Handle") or TSeat
+        if seatHandle and seatHandle:IsA("BasePart") then
+            bpart(seatHandle)
+        end
+    end
+    if folkenhawking then folkenhawking:Destroy() end
+    if Humanoid and Humanoid.Parent then
+        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+    end
+    if f and RootPart and RootPart.Parent and Character and Character.Parent then
+        workspace.CurrentCamera.CameraSubject = Humanoid
+        RootPart.CFrame = OldPos
+        RootPart.Velocity = Vector3.zero
+        RootPart.RotVelocity = Vector3.zero
+        Character:SetPrimaryPartCFrame(OldPos)
+    end
+    if TSeat and TSeat.Parent and TSeatWasAnchored ~= nil then
+        pcall(function() TSeat.Anchored = TSeatWasAnchored end)
+    end
+    workspace.FallenPartsDestroyHeight = OldFPDH
+    fr = false
+    return true
+end
+local function floop()
+    while f do
+        local lchar = LP.Character
+        local lhrp = lchar and lchar:FindFirstChild("HumanoidRootPart")
+        local humanoid = lchar and lchar:FindFirstChild("Humanoid")
+        if not lhrp or not humanoid or humanoid.Health <= 0 then
+            waitforit()
+            if not f then break end
+            task.wait(0.1)
+            continue
+        end
+        if #tar == 0 then break end
+        if tarindex > #tar then
+            tarindex = 1
+        end
+        local target = tar[tarindex]
+        if not target then
+            if #tar > 0 then
+                tarindex = 1
+                target = tar[1]
+            else
+                break
+            end
+        end
+        local tchar = target and target.Character
+        local thrp = tchar and tchar:FindFirstChild("HumanoidRootPart")
+        if not thrp then
+            if dihhh then setInvisible(false) end
+            if alllllll and #tar > 1 then
+                tarindex = tarindex + 1
+                if tarindex > #tar then tarindex = 1 end
+            end
+            task.wait(0.1)
+            continue
+        end
+        local _, seatState = seaterchecker(target)
+        if seatState == "anchored" then
+            if dihhh then setInvisible(false) end
+            if alllllll and #tar > 1 then
+                tarindex = tarindex + 1
+                if tarindex > #tar then tarindex = 1 end
+                task.wait(0.05)
+                continue
+            else
+                task.wait(0.1)
+                continue
+            end
+        end
+        if seatState == "nochar" or seatState == "nohum" then
+            if dihhh then setInvisible(false) end
+            if alllllll and #tar > 1 then
+                tarindex = tarindex + 1
+                if tarindex > #tar then tarindex = 1 end
+            end
+            task.wait(0.1)
+            continue
+        end
+        if not dihhh then setInvisible(true) end
+        stupidfling(target)
+        task.wait(0.05)
+        if alllllll and #tar > 1 then
+            tarindex = tarindex + 1
+            if tarindex > #tar then tarindex = 1 end
+        end
+    end
+end
 local function throwit()
-    if isFlinging then
+    if f then
         nothrow()
+        mehh()
         return
     end
-    
     local char = LP.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     if not hrp then
         warn("You must have a character!")
         return
     end
-    originalCFrame = hrp.CFrame
-    
+    org = hrp.CFrame
+    orgg = Workspace.FallenPartsDestroyHeight
     local targetPattern = plrInput.Text
-    local powerStr = powerInput.Text
-    local powerNum = tonumber(powerStr)
-    if not powerNum then
-        powerNum = 900
-    end
-    flingPower = powerNum
-    
-    useAllMode = (targetPattern:lower() == "all")
-    currentTargets = getname(targetPattern)
-    
-    if #currentTargets == 0 then
+    local powerNum = tonumber(powerInput.Text) or 900
+    powa = powerNum
+    alllllll = (targetPattern:lower() == "all")
+    tar = getname(targetPattern)
+    if #tar == 0 then
         warn("No players matched that pattern.")
         return
     end
-    
-    isFlinging = true
+    f = true
     toggleBtn.Text = "STOP"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
-    infoLabel.Text = "(@gpssickle) Targets: " .. #currentTargets .. " / Cycling: " .. (useAllMode and "Yessirski" or "Hell nah")
-    
-    setInvisible(true)
-    
-    for _, target in ipairs(currentTargets) do
+    infoLabel.Text = "(@gpssickle) Targets: " .. #tar .. " / Cycling: " .. (alllllll and "Yessirski" or "Hell nah")
+    for _, target in ipairs(tar) do
         re(target)
     end
-    
-    connection = RunService.Heartbeat:Connect(function()
-        if not isFlinging then return end
-        local lchar = LP.Character
-        local lhrp = lchar and lchar:FindFirstChild("HumanoidRootPart")
-        local humanoid = lchar and lchar:FindFirstChild("Humanoid")
-        
-        if not lhrp or not humanoid or humanoid.Health <= 0 then
-            if connection then
-                connection:Disconnect()
-                connection = nil
-            end
-            task.spawn(function()
-                waitforit()
-                if isFlinging then
-                    connection = RunService.Heartbeat:Connect(function()
-                        if not isFlinging then return end
-                        
-                        local lchar2 = LP.Character
-                        local lhrp2 = lchar2 and lchar2:FindFirstChild("HumanoidRootPart")
-                        local humanoid2 = lchar2 and lchar2:FindFirstChild("Humanoid")
-                        
-                        if not lhrp2 or not humanoid2 or humanoid2.Health <= 0 then
-                            return
-                        end
-                        
-                        if currentTargetIndex > #currentTargets then
-                            currentTargetIndex = 1
-                        end
-                        
-                        local target = currentTargets[currentTargetIndex]
-                        if not target then
-                            if #currentTargets > 0 then
-                                currentTargetIndex = 1
-                                target = currentTargets[1]
-                            else
-                                return
-                            end
-                        end
-                        
-                        local tchar = target.Character
-                        local thrp = tchar and tchar:FindFirstChild("HumanoidRootPart")
-                        
-                        if not thrp then
-                            if useAllMode then
-                                currentTargetIndex = currentTargetIndex + 1
-                                if currentTargetIndex > #currentTargets then
-                                    currentTargetIndex = 1
-                                end
-                            end
-                            return
-                        end
-                        
-                        lhrp2.CFrame = thrp.CFrame
-                        pcall(sethiddenproperty, lhrp2, "PhysicsRepRootPart", thrp)
-                        lhrp2.Velocity = Vector3.new(0, -flingPower, 0)
-                        lhrp2.RotVelocity = Vector3.zero
-                        
-                        if useAllMode and #currentTargets > 1 then
-                            currentTargetIndex = currentTargetIndex + 1
-                            if currentTargetIndex > #currentTargets then
-                                currentTargetIndex = 1
-                            end
-                        end
-                    end)
-                end
-            end)
-            return
-        end
-        
-        if currentTargetIndex > #currentTargets then
-            currentTargetIndex = 1
-        end
-        
-        local target = currentTargets[currentTargetIndex]
-        if not target then
-            if #currentTargets > 0 then
-                currentTargetIndex = 1
-                target = currentTargets[1]
-            else
-                return
-            end
-        end
-        
-        local tchar = target.Character
-        local thrp = tchar and tchar:FindFirstChild("HumanoidRootPart")
-        
-        if not thrp then
-            if useAllMode then
-                currentTargetIndex = currentTargetIndex + 1
-                if currentTargetIndex > #currentTargets then
-                    currentTargetIndex = 1
-                end
-            end
-            return
-        end
-        
-        lhrp.CFrame = thrp.CFrame
-        pcall(sethiddenproperty, lhrp, "PhysicsRepRootPart", thrp)
-        lhrp.Velocity = Vector3.new(0, -flingPower, 0)
-        lhrp.RotVelocity = Vector3.zero
-        
-        if useAllMode and #currentTargets > 1 then
-            currentTargetIndex = currentTargetIndex + 1
-            if currentTargetIndex > #currentTargets then
-                currentTargetIndex = 1
-            end
-        end
-    end)
+    meh()
+    ft = task.spawn(floop)
 end
 local player = Players.LocalPlayer
 local function folk(character)
-	local hrp = character:WaitForChild("HumanoidRootPart", 5)
-	if not hrp then
-		return
-	end
-
-	RunService.RenderStepped:Connect(function()
-		if hrp.Parent then
-			hrp.LocalTransparencyModifier = 1
-			hrp.Transparency = 1
-		end
-	end)
+    local hrp = character:WaitForChild("HumanoidRootPart", 5)
+    if not hrp then return end
+    RunService.RenderStepped:Connect(function()
+        if hrp.Parent then
+            hrp.LocalTransparencyModifier = 1
+            hrp.Transparency = 1
+        end
+    end)
 end
 if player.Character then
-	folk(player.Character)
+    folk(player.Character)
 end
 player.CharacterAdded:Connect(folk)
+local function buhhhhhbyyeeee()
+    if buhbye then return end
+    buhbye = true
+    partcon = false
+    f = false
+    fr = false
+    ft = nil
+    mehh()
+    for _, conn in pairs(respawnfullly) do
+        pcall(function() conn:Disconnect() end)
+    end
+    respawnfullly = {}
+    if sigram then
+        pcall(function() sigram:Disconnect() end)
+        sigram = nil
+    end
+    vi = false
+    local char = LP.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        for _, child in ipairs(hrp:GetChildren()) do
+            if child:IsA("BodyVelocity")
+                or child:IsA("BodyGyro")
+                or child:IsA("BodyAngularVelocity")
+                or child:IsA("BodyForce") then
+                pcall(function() child:Destroy() end)
+            end
+        end
+        if org then
+            pcall(function()
+                hrp.CFrame = org
+                hrp.Velocity = Vector3.zero
+                hrp.RotVelocity = Vector3.zero
+                hrp.AssemblyLinearVelocity = Vector3.zero
+                hrp.AssemblyAngularVelocity = Vector3.zero
+            end)
+        end
+    end
+    if char and org then
+        pcall(function() char:SetPrimaryPartCFrame(org) end)
+    end
+    pcall(function()
+        Workspace.FallenPartsDestroyHeight = orgg
+    end)
+    pcall(function() setInvisible(false) end)
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            pcall(function() workspace.CurrentCamera.CameraSubject = humanoid end)
+        end
+    end
+    tar = {}
+    tarindex = 1
+    org = nil
+    alllllll = false
+    dihhh = false
+end
 toggleBtn.MouseButton1Click:Connect(throwit)
-
 viewToggle.MouseButton1Click:Connect(function()
-    isViewEnabled = not isViewEnabled
-    
-    if isViewEnabled then
+    vi = not vi
+    if vi then
         viewToggle.Text = "ON"
         viewToggle.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
         seekit()
@@ -572,16 +790,24 @@ viewToggle.MouseButton1Click:Connect(function()
     end
 end)
 plrInput:GetPropertyChangedSignal("Text"):Connect(function()
-    if isViewEnabled then
+    if vi then
         refreshit()
     end
 end)
 LP.CharacterAdded:Connect(function()
-    if isFlinging then
+    if f then
         clrre()
-        for _, target in ipairs(currentTargets) do
+        for _, target in ipairs(tar) do
             re(target)
         end
-        setInvisible(true)
     end
+end)
+closeBtn.MouseButton1Click:Connect(function()
+    buhhhhhbyyeeee()
+    if gui then
+        gui:Destroy()
+    end
+end)
+gui.Destroying:Connect(function()
+    buhhhhhbyyeeee()
 end)
