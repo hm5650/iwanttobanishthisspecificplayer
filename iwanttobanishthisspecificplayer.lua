@@ -571,14 +571,6 @@ local function stupidfling(TargetPlayer)
     elseif not TRootPart and not THead and Accessory and Handle then
         bpart(Handle)
     end
-    -- REMOVED: Seat fling code that relied on TSeat
-    -- The following block was removed:
-    -- if TSeat and TSeat.Parent and f then
-    --     local seatHandle = TSeat:FindFirstChild("Handle") or TSeat
-    --     if seatHandle and seatHandle:IsA("BasePart") then
-    --         bpart(seatHandle)
-    --     end
-    -- end
     if folkenhawking then folkenhawking:Destroy() end
     if Humanoid and Humanoid.Parent then
         Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
@@ -590,11 +582,6 @@ local function stupidfling(TargetPlayer)
         RootPart.RotVelocity = Vector3.zero
         Character:SetPrimaryPartCFrame(OldPos)
     end
-    -- REMOVED: Seat unanchoring code
-    -- The following block was removed:
-    -- if TSeat and TSeat.Parent and TSeatWasAnchored ~= nil then
-    --     pcall(function() TSeat.Anchored = TSeatWasAnchored end)
-    -- end
     workspace.FallenPartsDestroyHeight = OldFPDH
     fr = false
     return true
