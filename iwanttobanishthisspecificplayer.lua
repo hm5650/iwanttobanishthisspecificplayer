@@ -481,16 +481,6 @@ local function stupidfling(TargetPlayer)
         fr = false
         return false
     end
-    local TSeat = nil
-    local TSeatWasAnchored = nil
-    if THumanoid.Sit and THumanoid.SeatPart then
-        local seat = THumanoid.SeatPart
-        if (seat:IsA("Seat") or seat:IsA("VehicleSeat")) and not seat.Anchored then
-            TSeat = seat
-            TSeatWasAnchored = seat.Anchored
-            pcall(function() seat.Anchored = true end)
-        end
-    end
     local OldPos = RootPart.CFrame
     local OldFPDH = workspace.FallenPartsDestroyHeight
     workspace.FallenPartsDestroyHeight = 0 / 0
@@ -581,12 +571,14 @@ local function stupidfling(TargetPlayer)
     elseif not TRootPart and not THead and Accessory and Handle then
         bpart(Handle)
     end
-    if TSeat and TSeat.Parent and f then
-        local seatHandle = TSeat:FindFirstChild("Handle") or TSeat
-        if seatHandle and seatHandle:IsA("BasePart") then
-            bpart(seatHandle)
-        end
-    end
+    -- REMOVED: Seat fling code that relied on TSeat
+    -- The following block was removed:
+    -- if TSeat and TSeat.Parent and f then
+    --     local seatHandle = TSeat:FindFirstChild("Handle") or TSeat
+    --     if seatHandle and seatHandle:IsA("BasePart") then
+    --         bpart(seatHandle)
+    --     end
+    -- end
     if folkenhawking then folkenhawking:Destroy() end
     if Humanoid and Humanoid.Parent then
         Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
@@ -598,9 +590,11 @@ local function stupidfling(TargetPlayer)
         RootPart.RotVelocity = Vector3.zero
         Character:SetPrimaryPartCFrame(OldPos)
     end
-    if TSeat and TSeat.Parent and TSeatWasAnchored ~= nil then
-        pcall(function() TSeat.Anchored = TSeatWasAnchored end)
-    end
+    -- REMOVED: Seat unanchoring code
+    -- The following block was removed:
+    -- if TSeat and TSeat.Parent and TSeatWasAnchored ~= nil then
+    --     pcall(function() TSeat.Anchored = TSeatWasAnchored end)
+    -- end
     workspace.FallenPartsDestroyHeight = OldFPDH
     fr = false
     return true
@@ -795,8 +789,7 @@ plrInput:GetPropertyChangedSignal("Text"):Connect(function()
     end
 end)
 LP.CharacterAdded:Connect(function()
-    if f then
-        clrre()
+    if f then        clrre()
         for _, target in ipairs(tar) do
             re(target)
         end
