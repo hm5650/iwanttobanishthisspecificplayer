@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local LP = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local partcon = false
+
 local pc = function()
     if partcon then return end
     partcon = true
@@ -11,7 +12,8 @@ local pc = function()
     task.spawn(function()
         while partcon do
             pcall(function()
-                Workspace.FallenPartsDestroyHeight = -999999999999999999999999999999999999999999999999e9999999999999999999999999999999999999999999999999999999999999999999
+                Workspace.FallenPartsDestroyHeight = 0/0
+                Workspace.FallHeightEnabled = false
                 plr.ReplicationFocus = workspace
                 plr.MaximumSimulationRadius = math.huge
                 plr.SimulationRadius = 10
@@ -27,6 +29,7 @@ local pc = function()
         end)
     end)
 end
+
 local gui = Instance.new("ScreenGui")
 local frame = Instance.new("Frame")
 local title = Instance.new("TextLabel")
@@ -41,9 +44,11 @@ local viewToggle = Instance.new("TextButton")
 local targetLabel = Instance.new("TextLabel")
 local toggleBtn = Instance.new("TextButton")
 local infoLabel = Instance.new("TextLabel")
+
 gui.Name = "iwanttobanishthisspecificplayer"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
 frame.Name = "Main"
 frame.Size = UDim2.new(0, 240, 0, 185)
 frame.Position = UDim2.new(0.5, -120, 0.5, -92)
@@ -52,6 +57,7 @@ frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
+
 title.Size = UDim2.new(1, -60, 0, 25)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -61,6 +67,7 @@ title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 14
 title.Parent = frame
+
 minimizeBtn.Size = UDim2.new(0, 30, 0, 20)
 minimizeBtn.Position = UDim2.new(1, -55, 0, 2)
 minimizeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -71,6 +78,7 @@ minimizeBtn.Font = Enum.Font.SourceSansBold
 minimizeBtn.TextSize = 14
 minimizeBtn.AutoButtonColor = false
 minimizeBtn.Parent = frame
+
 closeBtn.Size = UDim2.new(0, 30, 0, 20)
 closeBtn.Position = UDim2.new(1, -25, 0, 2)
 closeBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
@@ -81,6 +89,7 @@ closeBtn.Font = Enum.Font.SourceSansBold
 closeBtn.TextSize = 14
 closeBtn.AutoButtonColor = false
 closeBtn.Parent = frame
+
 plrLabel.Size = UDim2.new(0, 80, 0, 20)
 plrLabel.Position = UDim2.new(0, 10, 0, 35)
 plrLabel.BackgroundTransparency = 1
@@ -89,6 +98,7 @@ plrLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 plrLabel.Font = Enum.Font.SourceSans
 plrLabel.TextSize = 14
 plrLabel.Parent = frame
+
 plrInput.Size = UDim2.new(1, -100, 0, 20)
 plrInput.Position = UDim2.new(0, 90, 0, 35)
 plrInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -99,6 +109,7 @@ plrInput.Font = Enum.Font.SourceSans
 plrInput.TextSize = 14
 plrInput.ClearTextOnFocus = false
 plrInput.Parent = frame
+
 powerLabel.Size = UDim2.new(0, 80, 0, 20)
 powerLabel.Position = UDim2.new(0, 10, 0, 65)
 powerLabel.BackgroundTransparency = 1
@@ -107,6 +118,7 @@ powerLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 powerLabel.Font = Enum.Font.SourceSans
 powerLabel.TextSize = 14
 powerLabel.Parent = frame
+
 powerInput.Size = UDim2.new(1, -100, 0, 20)
 powerInput.Position = UDim2.new(0, 90, 0, 65)
 powerInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -117,6 +129,7 @@ powerInput.Font = Enum.Font.SourceSans
 powerInput.TextSize = 14
 powerInput.ClearTextOnFocus = false
 powerInput.Parent = frame
+
 viewLabel.Size = UDim2.new(0, 80, 0, 20)
 viewLabel.Position = UDim2.new(0, 10, 0, 92)
 viewLabel.BackgroundTransparency = 1
@@ -125,6 +138,7 @@ viewLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 viewLabel.Font = Enum.Font.SourceSans
 viewLabel.TextSize = 14
 viewLabel.Parent = frame
+
 viewToggle.Size = UDim2.new(0, 60, 0, 20)
 viewToggle.Position = UDim2.new(0, 90, 0, 92)
 viewToggle.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
@@ -135,6 +149,7 @@ viewToggle.Font = Enum.Font.SourceSansBold
 viewToggle.TextSize = 12
 viewToggle.AutoButtonColor = false
 viewToggle.Parent = frame
+
 targetLabel.Size = UDim2.new(0, 80, 0, 16)
 targetLabel.Position = UDim2.new(0, 155, 0, 94)
 targetLabel.BackgroundTransparency = 1
@@ -144,6 +159,7 @@ targetLabel.Font = Enum.Font.SourceSans
 targetLabel.TextSize = 11
 targetLabel.TextXAlignment = Enum.TextXAlignment.Left
 targetLabel.Parent = frame
+
 toggleBtn.Size = UDim2.new(1, -20, 0, 30)
 toggleBtn.Position = UDim2.new(0, 10, 0, 120)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
@@ -153,6 +169,7 @@ toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 toggleBtn.Font = Enum.Font.SourceSansBold
 toggleBtn.TextSize = 16
 toggleBtn.Parent = frame
+
 infoLabel.Size = UDim2.new(1, -20, 0, 16)
 infoLabel.Position = UDim2.new(0, 10, 0, 155)
 infoLabel.BackgroundTransparency = 1
@@ -162,7 +179,9 @@ infoLabel.Font = Enum.Font.SourceSans
 infoLabel.TextSize = 11
 infoLabel.TextXAlignment = Enum.TextXAlignment.Left
 infoLabel.Parent = frame
+
 gui.Parent = (LP.PlayerGui or game:GetService("CoreGui"))
+
 local f = false
 local vi = false
 local powa = 900
@@ -180,7 +199,9 @@ local ft = nil
 local fr = false
 local buhbye = false
 local seatMonitorThread = nil
+
 pc()
+
 minimizeBtn.MouseButton1Click:Connect(function()
     collapsed = not collapsed
     if collapsed then
@@ -210,6 +231,7 @@ minimizeBtn.MouseButton1Click:Connect(function()
         minimizeBtn.Text = "—"
     end
 end)
+
 local function findit()
     local pattern = plrInput.Text:lower()
     if pattern == "" then return nil end
@@ -222,6 +244,7 @@ local function findit()
     end
     return nil
 end
+
 local function refreshit()
     if not vi then return end
     local target = findit()
@@ -236,6 +259,7 @@ local function refreshit()
         targetLabel.Text = "No target"
     end
 end
+
 local function seekit()
     if sigram then
         sigram:Disconnect()
@@ -253,6 +277,7 @@ local function seekit()
     end)
     refreshit()
 end
+
 local function noseek()
     if sigram then
         sigram:Disconnect()
@@ -263,6 +288,7 @@ local function noseek()
     end
     targetLabel.Text = ""
 end
+
 local function getname(pattern)
     local list = {}
     pattern = pattern:lower()
@@ -283,6 +309,7 @@ local function getname(pattern)
     end
     return list
 end
+
 local function re(target)
     if respawnfullly[target] then
         respawnfullly[target]:Disconnect()
@@ -304,12 +331,14 @@ local function re(target)
         end
     end)
 end
+
 local function clrre()
     for _, conn in pairs(respawnfullly) do
         pcall(function() conn:Disconnect() end)
     end
     respawnfullly = {}
 end
+
 local function setInvisible(state)
     local char = LP.Character
     if char then
@@ -328,6 +357,7 @@ local function setInvisible(state)
     end
     dihhh = state
 end
+
 local function nothrow()
     f = false
     fr = false
@@ -348,6 +378,7 @@ local function nothrow()
     end
     setInvisible(false)
     Workspace.FallenPartsDestroyHeight = orgg
+    Workspace.FallHeightEnabled = true
     if hrp and org then
         hrp.CFrame = org
         hrp.Velocity = Vector3.zero
@@ -372,6 +403,7 @@ local function nothrow()
     toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
     infoLabel.Text = "(@gpssickle) Targets: 0 / Cycling: Hell nah"
 end
+
 local function waitforit()
     while f do
         local charAdded = LP.CharacterAdded:Wait()
@@ -394,6 +426,7 @@ local function waitforit()
         end
     end
 end
+
 local function nosittingforyou()
     local char = LP.Character
     if not char then return end
@@ -416,6 +449,7 @@ local function nosittingforyou()
         end
     end)
 end
+
 local function meh()
     if seatMonitorThread then return end
     seatMonitorThread = task.spawn(function()
@@ -426,6 +460,7 @@ local function meh()
         seatMonitorThread = nil
     end)
 end
+
 local function mehh()
     local char = LP.Character
     if char then
@@ -438,6 +473,7 @@ local function mehh()
     end
     seatMonitorThread = nil
 end
+
 local function seaterchecker(TargetPlayer)
     local TCharacter = TargetPlayer.Character
     if not TCharacter then return nil, "nochar" end
@@ -458,6 +494,7 @@ local function seaterchecker(TargetPlayer)
     end
     return THumanoid, "unanchored"
 end
+
 local function stupidfling(TargetPlayer)
     if fr then return false end
     local THumanoid, seatState = seaterchecker(TargetPlayer)
@@ -483,7 +520,8 @@ local function stupidfling(TargetPlayer)
     end
     local OldPos = RootPart.CFrame
     local OldFPDH = workspace.FallenPartsDestroyHeight
-    workspace.FallenPartsDestroyHeight = 0 / 0
+    workspace.FallenPartsDestroyHeight = 0/0
+    workspace.FallHeightEnabled = false
     if THead then
         workspace.CurrentCamera.CameraSubject = THead
     elseif Handle then
@@ -583,9 +621,11 @@ local function stupidfling(TargetPlayer)
         Character:SetPrimaryPartCFrame(OldPos)
     end
     workspace.FallenPartsDestroyHeight = OldFPDH
+    workspace.FallHeightEnabled = true
     fr = false
     return true
 end
+
 local function floop()
     while f do
         local lchar = LP.Character
@@ -652,6 +692,7 @@ local function floop()
         end
     end
 end
+
 local function throwit()
     if f then
         nothrow()
@@ -685,6 +726,7 @@ local function throwit()
     meh()
     ft = task.spawn(floop)
 end
+
 local player = Players.LocalPlayer
 local function folk(character)
     local hrp = character:WaitForChild("HumanoidRootPart", 5)
@@ -700,6 +742,7 @@ if player.Character then
     folk(player.Character)
 end
 player.CharacterAdded:Connect(folk)
+
 local function buhhhhhbyyeeee()
     if buhbye then return end
     buhbye = true
@@ -743,6 +786,7 @@ local function buhhhhhbyyeeee()
     end
     pcall(function()
         Workspace.FallenPartsDestroyHeight = orgg
+        Workspace.FallHeightEnabled = true
     end)
     pcall(function() setInvisible(false) end)
     if char then
@@ -757,7 +801,9 @@ local function buhhhhhbyyeeee()
     alllllll = false
     dihhh = false
 end
+
 toggleBtn.MouseButton1Click:Connect(throwit)
+
 viewToggle.MouseButton1Click:Connect(function()
     vi = not vi
     if vi then
@@ -770,24 +816,29 @@ viewToggle.MouseButton1Click:Connect(function()
         noseek()
     end
 end)
+
 plrInput:GetPropertyChangedSignal("Text"):Connect(function()
     if vi then
         refreshit()
     end
 end)
+
 LP.CharacterAdded:Connect(function()
-    if f then        clrre()
+    if f then
+        clrre()
         for _, target in ipairs(tar) do
             re(target)
         end
     end
 end)
+
 closeBtn.MouseButton1Click:Connect(function()
     buhhhhhbyyeeee()
     if gui then
         gui:Destroy()
     end
 end)
+
 gui.Destroying:Connect(function()
     buhhhhhbyyeeee()
 end)
